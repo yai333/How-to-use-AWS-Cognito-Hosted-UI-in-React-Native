@@ -13,4 +13,4 @@ npm install --save
 react-native run-ios
 ```
 
-<video src="vid_480p.mp4" width="500" height="300" controls preload />
+![alt demo](ezgif-1-ef8cc76413ff.gif)
