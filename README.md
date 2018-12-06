@@ -13,4 +13,4 @@ npm install --save
 react-native run-ios
 ```
 
-![alt demo](ezgif-1-ef8cc76413ff.gif)
+![alt demo](ezgif-1-01d8ca0f8d2b.gif)
