@@ -16,6 +16,7 @@ import {
   Linking
 } from "react-native";
 import SafariView from "react-native-safari-view";
+import InAppBrowser from "react-native-inappbrowser-reborn";
 
 const instructions = Platform.select({
   ios: "Press Cmd+R to reload,\n" + "Cmd+D or shake for dev menu",
@@ -25,21 +26,18 @@ const instructions = Platform.select({
 });
 
 const url =
-  "https://xxx.auth.ap-southeast-2.amazoncognito.com/login?response_type=code&client_id=xxx&redirect_uri=runningman://";
+  "https://xxx.auth.ap-southeast-2.amazoncognito.com/login?response_type=code&client_id=xxxx&redirect_uri=runningman://";
 
 type Props = {};
 export default class App extends Component<Props> {
   componentDidMount() {
-    let showSubscription = SafariView.addEventListener("onShow", () => {
-      console.log("Browser started to show");
-    });
     Linking.addEventListener("url", this.eventHandler);
   }
 
   eventHandler = event => {
     console.log("event", event);
     const code = event.url.match(/code=([^&]+)/)[1];
-    SafariView.dismiss();
+    Platform.OS === "ios" && SafariView.dismiss();
     this.getTokenbyCode(code);
   };
 
@@ -47,7 +45,7 @@ export default class App extends Component<Props> {
     const details = {
       grant_type: "authorization_code",
       code,
-      client_id: "xxx",
+      client_id: "xxxxxx",
       redirect_uri: "runningman://"
     };
     const formBody = Object.keys(details)
@@ -74,10 +72,24 @@ export default class App extends Component<Props> {
       });
   };
 
-  _pressHandler = () => {
-    SafariView.show({
-      url
-    });
+  pressHandler = () => {
+    Platform.OS === "ios"
+      ? SafariView.show({
+          url
+        })
+      : InAppBrowser.open(url, {
+          showTitle: true,
+          toolbarColor: "#6200EE",
+          secondaryToolbarColor: "black",
+          enableUrlBarHiding: true,
+          enableDefaultShare: true,
+          forceCloseOnRedirection: false,
+          headers: {
+            "my-custom-header": "Neami SSO"
+          }
+        }).then(result => {
+          console.log("result", JSON.stringify(result));
+        });
   };
   render() {
     return (
@@ -85,7 +97,7 @@ export default class App extends Component<Props> {
         <Text style={styles.welcome}>Welcome to React Native!</Text>
         <Text style={styles.instructions}>To get started, edit App.js</Text>
         <Text style={styles.instructions}>{instructions}</Text>
-        <Button onPress={this._pressHandler} title="Login" />
+        <Button onPress={this.pressHandler} title="Login" />
       </View>
     );
   }
