@@ -16,7 +16,7 @@ import {
   Linking
 } from "react-native";
 import SafariView from "react-native-safari-view";
-import InAppBrowser from "react-native-inappbrowser-reborn";
+import InAppBrowser from "react-native-inappbrowser-android";
 
 const instructions = Platform.select({
   ios: "Press Cmd+R to reload,\n" + "Cmd+D or shake for dev menu",
@@ -26,7 +26,7 @@ const instructions = Platform.select({
 });
 
 const url =
-  "https://xxx.auth.ap-southeast-2.amazoncognito.com/login?response_type=code&client_id=xxxx&redirect_uri=runningman://";
+  "https://ehealth.auth.ap-southeast-2.amazoncognito.com/login?response_type=code&client_id=5sbs3b87bcmaoq7hrfohh4gh8e&redirect_uri=runningman://";
 
 type Props = {};
 export default class App extends Component<Props> {
@@ -45,7 +45,7 @@ export default class App extends Component<Props> {
     const details = {
       grant_type: "authorization_code",
       code,
-      client_id: "xxxxxx",
+      client_id: "5sbs3b87bcmaoq7hrfohh4gh8e",
       redirect_uri: "runningman://"
     };
     const formBody = Object.keys(details)

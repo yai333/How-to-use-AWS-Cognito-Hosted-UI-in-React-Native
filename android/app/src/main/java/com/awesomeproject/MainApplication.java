@@ -3,7 +3,7 @@ package com.awesomeproject;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
-import com.proyecto26.inappbrowser.RNInAppBrowserPackage;
+import com.neami.inappbrowser.RNInAppBrowserPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
