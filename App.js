@@ -18,6 +18,7 @@ import {
 import SafariView from "react-native-safari-view";
 import InAppBrowser from "react-native-inappbrowser-android";
 
+const CLIENT_ID = "";
 const instructions = Platform.select({
   ios: "Press Cmd+R to reload,\n" + "Cmd+D or shake for dev menu",
   android:
@@ -25,8 +26,11 @@ const instructions = Platform.select({
     "Shake or press menu button for dev menu"
 });
 
-const url =
-  "https://ehealth.auth.ap-southeast-2.amazoncognito.com/login?response_type=code&client_id=5sbs3b87bcmaoq7hrfohh4gh8e&redirect_uri=runningman://";
+const loginURL = `https://ehealth.auth.ap-southeast-2.amazoncognito.com/login?response_type=code&client_id=${CLIENT_ID}&redirect_uri=runningman://`;
+
+const logoutURL = `https://ehealth.auth.ap-southeast-2.amazoncognito.com/login?response_type=code&client_id=${CLIENT_ID}&redirect_uri=runningman://?code=logout`;
+
+const clearADSessionURL = `https://login.microsoftonline.com/common/oauth2/logout?post_logout_redirect_uri=way2home://?code=clearADsession`;
 
 type Props = {};
 export default class App extends Component<Props> {
@@ -38,14 +42,19 @@ export default class App extends Component<Props> {
     console.log("event", event);
     const code = event.url.match(/code=([^&]+)/)[1];
     Platform.OS === "ios" && SafariView.dismiss();
-    this.getTokenbyCode(code);
+    if (code === "logout") {
+      //log out action
+    } else if (code !== "clearADsession") {
+      //log in
+      this.getTokenbyCode(code);
+    }
   };
 
   getTokenbyCode = code => {
     const details = {
       grant_type: "authorization_code",
       code,
-      client_id: "5sbs3b87bcmaoq7hrfohh4gh8e",
+      client_id: CLIENT_ID,
       redirect_uri: "runningman://"
     };
     const formBody = Object.keys(details)
@@ -72,7 +81,7 @@ export default class App extends Component<Props> {
       });
   };
 
-  pressHandler = () => {
+  pressHandler = url => {
     Platform.OS === "ios"
       ? SafariView.show({
           url
@@ -90,6 +99,14 @@ export default class App extends Component<Props> {
         }).then(result => {
           console.log("result", JSON.stringify(result));
         });
+
+    if (url.includes("logout")) {
+      setTimeout(() => {
+        SafariView.show({
+          url: clearADSessionURL
+        });
+      }, 2500);
+    }
   };
   render() {
     return (
@@ -97,7 +114,8 @@ export default class App extends Component<Props> {
         <Text style={styles.welcome}>Welcome to React Native!</Text>
         <Text style={styles.instructions}>To get started, edit App.js</Text>
         <Text style={styles.instructions}>{instructions}</Text>
-        <Button onPress={this.pressHandler} title="Login" />
+        <Button onPress={() => this.pressHandler(loginURL)} title="Login" />
+        <Button onPress={() => this.pressHandler(logoutURL)} title="Logout" />
       </View>
     );
   }
