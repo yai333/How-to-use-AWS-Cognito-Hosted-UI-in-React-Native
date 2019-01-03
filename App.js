@@ -44,7 +44,11 @@ export default class App extends Component<Props> {
     Platform.OS === "ios" && SafariView.dismiss();
     if (code === "logout") {
       //log out action
-    } else if (code !== "clearADsession") {
+    } else if (
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+        code
+      )
+    ) {
       //log in
       this.getTokenbyCode(code);
     }
