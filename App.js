@@ -47,21 +47,8 @@ export default class App extends Component<Props> {
         code
       )
     ) {
-      this.loginStore
-        .getTokenbyCode(code)
-        .then(() => {
-          this.bgService.initBackgroundLocation();
-          this.configs.parseTagVariables(this.loginStore.userDetail.group);
-          this.mapStore.getMarkersFromServer(this.configs);
-          this.nav.navigate("Home");
-          setTimeout(() => {
-            this.bgService.configurePushNoti();
-            if (!this.bgService.initialized) this.bgService.initialized = true;
-          }, 2000);
-        })
-        .catch(err => {
-          Alert.alert(err.message || "Login failed, please try again later.");
-        });
+      //send login auth request
+      this.getTokenbyCode(code);
     }
   };
 
