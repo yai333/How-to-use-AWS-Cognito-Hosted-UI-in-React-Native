@@ -28,9 +28,7 @@ const instructions = Platform.select({
 
 const loginURL = `https://ehealth.auth.ap-southeast-2.amazoncognito.com/login?response_type=code&client_id=${CLIENT_ID}&redirect_uri=runningman://`;
 
-const logoutURL = `https://ehealth.auth.ap-southeast-2.amazoncognito.com/login?response_type=code&client_id=${CLIENT_ID}&redirect_uri=runningman://?code=logout`;
-
-const clearADSessionURL = `https://login.microsoftonline.com/common/oauth2/logout?post_logout_redirect_uri=way2home://?code=clearADsession`;
+const logoutURL = `https://ehealth.auth.ap-southeast-2.amazoncognito.com/logout?client_id=${CLIENT_ID}&logout_uri=runningman://?code=logout`;
 
 type Props = {};
 export default class App extends Component<Props> {
@@ -39,18 +37,31 @@ export default class App extends Component<Props> {
   }
 
   eventHandler = event => {
-    console.log("event", event);
-    const code = event.url.match(/code=([^&]+)/)[1];
+    const code =
+      (/code=([^&]+)/.test(event.url) && event.url.match(/code=([^&]+)/)[1]) ||
+      null;
+    if (!code) return;
     Platform.OS === "ios" && SafariView.dismiss();
-    if (code === "logout") {
-      //log out action
-    } else if (
+    if (
       /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
         code
       )
     ) {
-      //log in
-      this.getTokenbyCode(code);
+      this.loginStore
+        .getTokenbyCode(code)
+        .then(() => {
+          this.bgService.initBackgroundLocation();
+          this.configs.parseTagVariables(this.loginStore.userDetail.group);
+          this.mapStore.getMarkersFromServer(this.configs);
+          this.nav.navigate("Home");
+          setTimeout(() => {
+            this.bgService.configurePushNoti();
+            if (!this.bgService.initialized) this.bgService.initialized = true;
+          }, 2000);
+        })
+        .catch(err => {
+          Alert.alert(err.message || "Login failed, please try again later.");
+        });
     }
   };
 
@@ -103,14 +114,6 @@ export default class App extends Component<Props> {
         }).then(result => {
           console.log("result", JSON.stringify(result));
         });
-
-    if (url.includes("logout")) {
-      setTimeout(() => {
-        SafariView.show({
-          url: clearADSessionURL
-        });
-      }, 2500);
-    }
   };
   render() {
     return (
